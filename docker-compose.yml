@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  server:
+    build: 
+      context: .
+      dockerfile: server/Dockerfile
+    ports:
+      - "50051:50051"
+
+  client:
+    build: 
+      context: .
+      dockerfile: client/Dockerfile
+    depends_on:
+      - server
+    command: ["go", "run", "main.go", "xzl"]

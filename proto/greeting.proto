@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package greeting;
+
+option go_package = "/Users/xuzilin/Desktop/greeting_service/proto";
+
+service GreetingService {
+    rpc SayHello(HelloRequest) returns (HelloResponse);
+}
+
+message HelloRequest{
+    string name = 1;
+}
+
+message HelloResponse{
+    string message = 1;
+}
+
+
