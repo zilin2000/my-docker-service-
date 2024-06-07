@@ -14,4 +14,4 @@ services:
       dockerfile: client/Dockerfile
     depends_on:
       - server
-    command: ["go", "run", "main.go", "xzl"]
+    command: ["./client","xzl"]
