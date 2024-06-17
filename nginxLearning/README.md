@@ -154,3 +154,166 @@ reload and start nginx
 brew services reload nginx
 brew services restart nginx
 ```
+
+
+## implement data control 9:1 
+
+add `weight` in upstream
+
+```golang
+    upstream backend {
+        server localhost:3001 weight=9;
+        server localhost:3002 weight=1;
+    }
+```
+
+
+好的，我很高兴能帮助你理解 `nginx.conf` 文件的语法和配置原理。
+
+### Nginx 配置文件结构
+
+Nginx 配置文件主要由以下几部分组成：
+
+1. **全局块（Global block）**：包括影响整个 Nginx 服务器的指令，如用户权限、进程数量等。
+2. **事件块（Events block）**：包括处理连接的指令，如最大连接数等。
+3. **HTTP 块（HTTP block）**：包括处理 HTTP 请求的指令，是最重要的一部分，包含多个子块（如 `server` 块、`location` 块等）。
+
+### 示例配置文件分析
+
+```nginx
+#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    upstream backend {
+        server localhost:3001 weight=9;
+        server localhost:3002 weight=1;
+    }
+
+    server {
+        listen       8080;
+        server_name  localhost;
+
+        location / {
+            proxy_pass http://backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+
+    include servers/*;
+}
+```
+
+### 主要配置项讲解
+
+#### 全局块
+
+```nginx
+worker_processes  1;
+```
+
+- `worker_processes`：指定 Nginx 工作进程的数量。一般设置为 CPU 核心数以充分利用多核。
+
+#### 事件块
+
+```nginx
+events {
+    worker_connections  1024;
+}
+```
+
+- `worker_connections`：每个工作进程的最大连接数。这个值决定了 Nginx 可以处理的最大并发连接数。
+
+#### HTTP 块
+
+```nginx
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+```
+
+- `include mime.types`：包含文件，定义了 MIME 类型。
+- `default_type`：设置默认的 MIME 类型。
+
+```nginx
+    upstream backend {
+        server localhost:3001 weight=9;
+        server localhost:3002 weight=1;
+    }
+```
+
+- `upstream`：定义一组后端服务器，用于负载均衡。
+  - `server`：定义后端服务器地址和权重（`weight`）。权重越大，服务器分配到的请求越多。
+
+```nginx
+    server {
+        listen       8080;
+        server_name  localhost;
+```
+
+- `server` 块：定义一个虚拟服务器。
+  - `listen`：定义服务器监听的端口。
+  - `server_name`：定义服务器名称。
+
+```nginx
+        location / {
+            proxy_pass http://backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+```
+
+- `location` 块：定义请求的路由规则。
+  - `proxy_pass`：将请求转发到 `upstream` 定义的后端服务器。
+  - `proxy_set_header`：设置转发请求时的头信息。
+
+```nginx
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+```
+
+- `error_page`：定义错误页面。
+  - `location = /50x.html`：定义特定错误页面的位置。
+
+### 总结
+
+通过配置 `nginx.conf` 文件，我们可以灵活地控制流量分发、负载均衡以及错误处理。理解每个配置项的作用，有助于我们根据需求进行定制和优化。希望这些解释对你理解 Nginx 配置文件有所帮助！如果有任何问题，请随时问我。
