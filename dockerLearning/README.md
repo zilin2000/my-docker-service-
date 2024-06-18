@@ -6,7 +6,7 @@
 
 ## basic commands
 
-`docker pull ubuntu:18.04`  
+`docker pull ubuntu:18.04`    
 
 pull a image from `Dockerhub`
 

@@ -1,14 +1,18 @@
+# 
+
+
+
 # same as Dockerfile in server
 FROM golang:1.16 AS builder 
 
 WORKDIR /build
-COPY ../go.mod .
-COPY ../go.sum .
+COPY go.mod .
+COPY go.sum .
 
 RUN go mod download
 
-COPY ../client/main.go .
-COPY ../proto ./proto
+COPY client/main.go .
+COPY proto ./proto
 
 
 # CMD ["go", "run", "main.go"]

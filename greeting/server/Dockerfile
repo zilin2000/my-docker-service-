@@ -6,15 +6,13 @@ FROM golang:1.16 AS builder
 # make a new working directory called /build 
 WORKDIR /build
 
-# 做上一次一样的操作
-COPY ../go.mod .
-COPY ../go.sum .
+# copy needed files into image
+COPY go.mod .
+COPY go.sum .
 RUN go mod download
 
-COPY ../server/main.go .
- 
-COPY ../proto ./proto
-
+COPY server/main.go .
+COPY proto ./proto
 
 # go build: name called server
 RUN go build -o server main.go
