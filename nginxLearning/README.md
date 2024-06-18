@@ -316,4 +316,41 @@ http {
 
 ### 总结
 
-通过配置 `nginx.conf` 文件，我们可以灵活地控制流量分发、负载均衡以及错误处理。理解每个配置项的作用，有助于我们根据需求进行定制和优化。希望这些解释对你理解 Nginx 配置文件有所帮助！如果有任何问题，请随时问我。
+通过配置 `nginx.conf` 文件，我们可以灵活地控制流量分发、负载均衡以及错误处理。理解每个配置项的作用，有助于我们根据需求进行定制和优化。
+
+### update on 6.18
+
+我们需要升级一下我们的项目，用官方nginx镜像并挂载本地的配置文件（.conf）
+
+> nginx PATH on my mac : /opt/homebrew/etc/nginx  
+> JS services on my mac: /Users/xuzilin/Desktop/sqbLearning/nginxLearning/serverJS
+
+**steps**
+
+pull official `nginx image`
+
+`docker pull nginx`
+
+edit `.conf` file, Docker 容器中的 Nginx 无法连接到本地主机上的 Node.js 服务。原因是 Docker 容器中的 localhost 指向的是容器本身，而不是主机系统。为了让容器内的 Nginx 访问主机上的 Node.js 服务，你需要使用主机网络模式或者特定的 IP 地址来实现。
+
+```nginx
+upstream backend {
+    server host.docker.internal:3001 weight=9;
+    server host.docker.internal:3002 weight=1;
+}
+```
+
+run two servers
+
+```sh
+node server1.js
+node server2.js
+```
+
+run nginx container
+
+```sh
+docker run --name my-nginx -v /opt/homebrew/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro -p 8080:8080 -d nginx
+```
+
+
