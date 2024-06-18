@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
-	pb "greeting_service/proto"
+	pb "github.com/zilin2000/my-docker-service-/proto"
 
 	"google.golang.org/grpc"
 )
 
 const (
-	address     = "server:50051"
+	address     = "greeting_server:50051"
 	defaultName = "world"
 )
 

@@ -20,11 +20,11 @@ RUN go build -o client main.go
 
 
 # stage 2
-FROM alpine:latest
+FROM ubuntu:18.04
 
 WORKDIR /app
 
-COPY --from=builder ../build/client .
-COPY --from=builder ../build/proto ./proto
+COPY --from=builder /build/client .
+COPY --from=builder /build/proto ./proto
 
 CMD [ "./client","xzl" ]

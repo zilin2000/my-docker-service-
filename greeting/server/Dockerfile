@@ -18,7 +18,7 @@ COPY proto ./proto
 RUN go build -o server main.go
 
 # stage 2: 把build好的东西都放到/app里面去运行
-FROM alpine:latest
+FROM ubuntu:18.04
 
 WORKDIR /app  
 

@@ -1,4 +1,4 @@
-module greeting_service
+module github.com/zilin2000/my-docker-service-
 
 go 1.16
 
